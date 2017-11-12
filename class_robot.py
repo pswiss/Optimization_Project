@@ -41,8 +41,8 @@ class Robot(object):
         self.amSeed = isSeed
 
         # Hop Count Variables
-        self.hop1 = 0
-        self.hop2 = 0
+        self.hop1 = 5000
+        self.hop2 = 5000
 
         # Known seed locations
         self.hop1x = -1
@@ -63,11 +63,11 @@ class Robot(object):
                 self.hop2y = self.yTrue
         # Otherwise I do not
         else:
-            self.xGuess = 0
-            self.yGuess = 0
+            self.xGuess = random()*300
+            self.yGuess = random()*300
 
         # Timer variables
-        self.hopLocalizeTimer = 0
+        self.hopLocalizeTimer = cyclesForHop
 
         
 
@@ -76,6 +76,7 @@ class Robot(object):
     # This function packages the message the robot wants to send
     def sendCom(self):
         # Create array I want to send
+        #           0           1           2           3           4           5           6           7           8           9
         comOut = [self.hop1, self.hop2, self.xGuess, self.yGuess, self.xTrue, self.yTrue, self.hop1x, self.hop1y, self.hop2x, self.hop2y]
 
         return comOut
@@ -91,8 +92,8 @@ class Robot(object):
         for message in globalComArray:
             
             # Calculate the true distance between the two robots
-            xDelta = abs(message[5] - self.xTrue)
-            yDelta = abs(message[6] - self.yTrue)
+            xDelta = abs(message[4] - self.xTrue)
+            yDelta = abs(message[5] - self.yTrue)
             distance = sqrt(xDelta^2 + yDelta^2)
             # Check if within range
             if distance > self.comRange:
@@ -127,22 +128,46 @@ class Robot(object):
     # Localization function
     # This function has two modes: 1) Hop count localization 2) Triangulation Localization. Both use Newton Raphson
     def localize(self):
-        # Decrement hop localization timer
-
-        # Check each message for updated hop seed locations
-
-        # If hop count
         # Check what the lowest hopcount of any message I see is for hop1 and hop2
         # Update to that number + 1
+        # Check each message for updated hop seed locations
+        for msg in self.recievedComs:
+            if self.hop1 > msg[0] + 1:
+                # Update my hop count information
+                self.hop1 = msg[0] + 1
+                self.hop1x = msg[6]
+                self.hop1y = msg[7]
 
-        # If hop done, use triangulation
-        # Create two gradient eval points
-        # Calculate the position error for each of the three points (guess + grads)
-        # Sum the Errors
+            if self.hop2 > msg[1] + 1:
+                # Update my hop count information
+                self.hop2 = msg[1] + 1
+                self.hop2x = msg[8]
+                self.hop2y = msg[9]
+                
+        # Decrement hop localization timer
+        self.hopLocalizeTimer = max(0,hopLocalizeTimer-1)
 
-        # Run n iterations of Newton Raphson to get new guess positions
+        # If hop count timer hasn't expired, localize based on hop-count
+        if hopLocalizeTimer > 0:
+            # Estimate how far I am from the the seeds
+            hop1dist = self.hop1 * (hopScale * self.comRange)
+            hop2dist = self.hop2 * (hopScale * self.comRange)
 
-        # Assign new guess
+            # Assume up against wall, seed is only in x
+            # Derived using geometry
+            self.xGuess = self.hop1x + self.hop2x * (hop1dist^2 / (hop1dist + hop2dist^2))
+            self.yGuess = self.xGuess*(self.hop2dist / self.hop1dist)
+            
+        else:
+            # If hop done, use triangulation
+            
+            # Create two gradient eval points
+            # Calculate the position error for each of the three points (guess + grads)
+            # Sum the Errors
+
+            # Run n iterations of Newton Raphson to get new guess positions
+
+            # Assign new guess
 
         return
         
