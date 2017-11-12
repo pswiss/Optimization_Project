@@ -22,11 +22,26 @@ Implement Calculate Error Function
 ----------------------------------------------------------------------------------------------------
 """
 
+###################################################################################################
+# Setup
+###################################################################################################
 # import the configuration variables
 from config_simulator import *
 
+###################################################################################################
+# Classes
+###################################################################################################
+
+###################################################################################################
+# Helper Functions
+###################################################################################################
+from function_calcDistance import *
+
+###################################################################################################
+# Main Class
+###################################################################################################
 class Robot(object):
-    ################################################################################################
+    ###############################################################################################
     # Constructor Function
     def __init__(self,comRange, comLossRate, comScale, comVar, xpos, ypos, isSeed):
         self.comRange = comRange
@@ -71,7 +86,7 @@ class Robot(object):
 
         
 
-    ################################################################################################
+    ###############################################################################################
     # Send communication function
     # This function packages the message the robot wants to send
     def sendCom(self):
@@ -81,7 +96,7 @@ class Robot(object):
 
         return comOut
 
-    ################################################################################################
+    ###############################################################################################
     # Recieve communication function
     # This function recieves the global communication array and determines which ones it can see
     def recCom(self, globalComArray):
@@ -89,12 +104,12 @@ class Robot(object):
         # Clear all recieved communications
         self.recievedComs = []
 
+        # Check to see if recieve communication messages
         for message in globalComArray:
             
             # Calculate the true distance between the two robots
-            xDelta = abs(message[4] - self.xTrue)
-            yDelta = abs(message[5] - self.yTrue)
-            distance = sqrt(xDelta^2 + yDelta^2)
+            distance = calcDistance([self.xTrue, self.yTrue],[message[4], message[5]])
+
             # Check if within range
             if distance > self.comRange:
                 recieveCom = False
@@ -112,19 +127,17 @@ class Robot(object):
         # All recieved messages have been added. This function does not pass any values
         return
 
-    ################################################################################################
+    ###############################################################################################
     # Calculate error function
     # This function returns the distance error from its estimated position and its true position
     def calcError(self):
-        # Calculate the true distance between the two robots
-        xDelta = abs(self.xGuess - self.xTrue)
-        yDelta = abs(self.yGuess - self.yTrue)
-        distanceError = sqrt(xDelta^2 + yDelta^2)
+        # Calculate the true distance between robot's expected and true position
+        distanceError = calcDistance([self.xTrue, self.yTrue],[self.xGuess, self.yGuess])
 
         # return the error
         return distanceError
         
-    ################################################################################################
+    ###############################################################################################
     # Localization function
     # This function has two modes: 1) Hop count localization 2) Triangulation Localization. Both use Newton Raphson
     def localize(self):

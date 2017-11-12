@@ -10,3 +10,6 @@ numIterNR = 5
 
 # For hopcount localization, estimate where the message is coming from
 hopScale = 0.3
+
+# Scale of the gradient points
+gradScale = 0.01
