@@ -103,6 +103,7 @@ class Robot(object):
         
         # Clear all recieved communications
         self.recievedComs = []
+        self.rangeMeasurements = []
 
         # Check to see if recieve communication messages
         for message in globalComArray:
@@ -122,7 +123,10 @@ class Robot(object):
 
             # If message is recieved, append it to the recieved Coms List
             if recieveCom == True:
-                self.recievedComs.append(message)
+                # Calculate the range measurements
+                rangeMeas = distance * max(0,normalvariate(self.comScale,pow(self.comVar,0.5)))
+                
+                self.recievedComs.append([message,rangeMeas])
 
         # All recieved messages have been added. This function does not pass any values
         return
@@ -145,17 +149,17 @@ class Robot(object):
         # Update to that number + 1
         # Check each message for updated hop seed locations
         for msg in self.recievedComs:
-            if self.hop1 > msg[0] + 1:
+            if self.hop1 > msg[0][0] + 1:
                 # Update my hop count information
-                self.hop1 = msg[0] + 1
-                self.hop1x = msg[6]
-                self.hop1y = msg[7]
+                self.hop1 = msg[0][0] + 1
+                self.hop1x = msg[0][6]
+                self.hop1y = msg[0][7]
 
-            if self.hop2 > msg[1] + 1:
+            if self.hop2 > msg[0][1] + 1:
                 # Update my hop count information
-                self.hop2 = msg[1] + 1
-                self.hop2x = msg[8]
-                self.hop2y = msg[9]
+                self.hop2 = msg[0][1] + 1
+                self.hop2x = msg[0][8]
+                self.hop2y = msg[0][9]
                 
         # Decrement hop localization timer
         self.hopLocalizeTimer = max(0,hopLocalizeTimer-1)
@@ -173,37 +177,43 @@ class Robot(object):
             
         else:
             # If hop done, use triangulation
-            
-            # Create two gradient eval points
-            # Calculate the position error for each of the three points (guess + grads)
-            # Sum the Errors
-
             # Run n iterations of Newton Raphson to get new guess positions
+            for i in range(numIterNR):
+            
+                # Create current point and two gradient eval points
+                currentGuess = [self.xGuess, self.yGuess]
+                xGradEval = [self.xGuess*(1+gradScale), self.yGuess]
+                yGradEval = [self.xGuess, self.yGuess*(1+gradScale)]
+                
+                # Calculate the position error for each of the three points (guess + grads)
+                currentError = 0
+                xGradError = 0
+                yGradError = 0
+                
+                # Iterate through each recieved message and sum the Errors
+                for msg in self.recievedComs:
+                    reportedPoint = [msg[0][2],msg[0][3]]
+                    # special case for if message is a seed: Weight higher
+                    if or(msg[0][0] == 0, msg[0][1] == 0):
+                        currentError = currentError + seedWeight*abs(msg[1] - calcDistance(currentGuess, reportedPoint))
+                        xGradError = xGradError + seedWeight*abs(msg[1] - calcDistance(xGradEval, reportedPoint))
+                        yGradError = yGradError + seedWeight*abs(msg[1] - calcDistance(yGradEval, reportedPoint))
 
-            # Assign new guess
+                    else:
+                        currentError = currentError + abs(msg[1] - calcDistance(currentGuess, reportedPoint))
+                        xGradError = xGradError + abs(msg[1] - calcDistance(xGradEval, reportedPoint))
+                        yGradError = yGradError + abs(msg[1] - calcDistance(yGradEval, reportedPoint))
+
+                # Calculate the gradient
+                xGrad = (currentError-xGradError)/(self.xGuess*gradScale)
+                yGrad = (currentError-yGradError)/(self.yGuess*gradScale)
+
+                # Assign new guess
+                self.xGuess = newtonRaphson(self.xGuess, currentError, xGrad)
+                self.yGuess = newtonRaphson(self.yGuess, currentError, yGrad)
 
         return
         
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
