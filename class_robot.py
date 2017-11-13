@@ -12,12 +12,12 @@ Required Libraries: N/A
 Revision History:
 11/08/2017 (1): Initial creation
 11/10/2017 (1): Added recCom function
+11/12/2017 (1): First attempt complete
 
 ----------------------------------------------------------------------------------------------------
 TODO:
 
-Implement Localization
-Implement Calculate Error Function
+Validate
 
 ----------------------------------------------------------------------------------------------------
 """

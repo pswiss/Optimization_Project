@@ -67,7 +67,7 @@ def simulation(config, comProperties):
     
     #----------------------------------------------------------------------------------------------
     # Initialize the simulation
-    Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar, comEccen)
+    Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar)
 
     # Run for n cycles
     for i in range(numCycles):
