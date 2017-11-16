@@ -249,7 +249,7 @@ class Robot(object):
                     self.yGuess = self.yTrue
                 #
 
-                print [self.xGuess, self.yGuess, self.xTrue, self.yTrue]
+                #print [self.xGuess, self.yGuess, self.xTrue, self.yTrue]
             #
             
         #

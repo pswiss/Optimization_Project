@@ -26,6 +26,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
+import time
+
 ###################################################################################################
 # Classes
 ###################################################################################################
@@ -48,8 +50,14 @@ def drawRobots(Robots):
         guessVert = [robot.xGuess, robot.yGuess]
         verts = [trueVert, guessVert]
 
-        ax.plot(trueVert,guessVert, color = 'r')
-        ax.plot(trueVert, 'o')
+        ax.plot([trueVert[0],guessVert[0]], [trueVert[1],guessVert[1]], color = 'r')
+        ax.plot(trueVert[0],trueVert[1], 'o')
+
+    plt.xlim(0,200)
+    plt.ylim(0,200)
+    plt.show()
+    time.sleep(0)
+    plt.close()
         
     
     return 0
