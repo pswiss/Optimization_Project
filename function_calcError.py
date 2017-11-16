@@ -31,9 +31,18 @@ Create
 ###################################################################################################
 # Helper Functions
 ###################################################################################################
+from function_calcDistance import *
 
 ###################################################################################################
 # Main Function
 ###################################################################################################
-def calcError(errors, comProperties):
-    return 0
+def calcError(Robots):
+    # This function will calculate the errors between robot calculated and true position
+    errors = []
+
+    for robot in Robots:
+        distErr = calcDistance([robot.xTrue, robot.yTrue], [robot.xGuess, robot.yGuess])
+        errors.append(distErr)
+
+        
+    return errors

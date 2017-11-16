@@ -27,6 +27,8 @@ Validate
 ###################################################################################################
 # import the configuration variables
 from config_simulator import *
+from random import *
+import time
 
 ###################################################################################################
 # Classes
@@ -36,6 +38,7 @@ from config_simulator import *
 # Helper Functions
 ###################################################################################################
 from function_calcDistance import *
+from function_newtonRaphson import *
 
 ###################################################################################################
 # Main Class
@@ -49,7 +52,7 @@ class Robot(object):
         self.comVar = comVar
         # Calculate the linear scale of the communication
         self.comScale = 1+comScale*(2*random()-1)
-
+        
         self.xTrue = xpos
         self.yTrue = ypos
 
@@ -71,15 +74,17 @@ class Robot(object):
             self.yGuess = self.yTrue
             # And I therefore know the true position of the seed
             if self.amSeed == 1:
+                self.hop1 = 0
                 self.hop1x = self.xTrue
                 self.hop1y = self.yTrue
-            else:
+            if self.amSeed == 2:
+                self.hop2 = 0
                 self.hop2x = self.xTrue
                 self.hop2y = self.yTrue
         # Otherwise I do not
         else:
-            self.xGuess = random()*300
-            self.yGuess = random()*300
+            self.xGuess = random()*arenaX
+            self.yGuess = random()*arenaY
 
         # Timer variables
         self.hopLocalizeTimer = cyclesForHop
@@ -124,7 +129,9 @@ class Robot(object):
             # If message is recieved, append it to the recieved Coms List
             if recieveCom == True:
                 # Calculate the range measurements
-                rangeMeas = distance * max(0,normalvariate(self.comScale,pow(self.comVar,0.5)))
+                rangeMeas = max(0,distance * self.comScale + normalvariate(0,pow(self.comVar,0.5)))
+
+                #print rangeMeas / (distance + 0.001)
                 
                 self.recievedComs.append([message,rangeMeas])
 
@@ -149,31 +156,38 @@ class Robot(object):
         # Update to that number + 1
         # Check each message for updated hop seed locations
         for msg in self.recievedComs:
-            if self.hop1 > msg[0][0] + 1:
+            
+            if (self.hop1 > (msg[0][0]+1)):
                 # Update my hop count information
                 self.hop1 = msg[0][0] + 1
                 self.hop1x = msg[0][6]
                 self.hop1y = msg[0][7]
 
-            if self.hop2 > msg[0][1] + 1:
+            if (self.hop2 > (msg[0][1]+1)):
                 # Update my hop count information
                 self.hop2 = msg[0][1] + 1
                 self.hop2x = msg[0][8]
                 self.hop2y = msg[0][9]
-                
+
         # Decrement hop localization timer
-        self.hopLocalizeTimer = max(0,hopLocalizeTimer-1)
+        self.hopLocalizeTimer = max(0,self.hopLocalizeTimer-1)
+
 
         # If hop count timer hasn't expired, localize based on hop-count
-        if hopLocalizeTimer > 0:
+        if self.hopLocalizeTimer > 0:
             # Estimate how far I am from the the seeds
-            hop1dist = self.hop1 * (hopScale * self.comRange)
-            hop2dist = self.hop2 * (hopScale * self.comRange)
+            hop1dist = self.hop1 * (hopScale )
+            hop2dist = self.hop2 * (hopScale )
 
-            # Assume up against wall, seed is only in x
-            # Derived using geometry
-            self.xGuess = self.hop1x + self.hop2x * (hop1dist^2 / (hop1dist + hop2dist^2))
-            self.yGuess = self.xGuess*(self.hop2dist / self.hop1dist)
+            # Assign new guess if not a seed
+            if self.amSeed == 0:
+                # Assume up against wall, seed is only in x
+                # Derived using geometry
+                self.xGuess = self.hop1x + self.hop2x * (hop1dist*hop1dist / (hop1dist + hop2dist*hop2dist))
+                self.yGuess = self.xGuess*(hop2dist / hop1dist)
+            else:
+                self.xGuess = self.xTrue
+                self.yGuess = self.yTrue
             
         else:
             # If hop done, use triangulation
@@ -182,8 +196,8 @@ class Robot(object):
             
                 # Create current point and two gradient eval points
                 currentGuess = [self.xGuess, self.yGuess]
-                xGradEval = [self.xGuess*(1+gradScale), self.yGuess]
-                yGradEval = [self.xGuess, self.yGuess*(1+gradScale)]
+                xGradEval = [self.xGuess+gradScale, self.yGuess]
+                yGradEval = [self.xGuess, self.yGuess+gradScale]
                 
                 # Calculate the position error for each of the three points (guess + grads)
                 currentError = 0
@@ -194,7 +208,7 @@ class Robot(object):
                 for msg in self.recievedComs:
                     reportedPoint = [msg[0][2],msg[0][3]]
                     # special case for if message is a seed: Weight higher
-                    if or(msg[0][0] == 0, msg[0][1] == 0):
+                    if (msg[0][0] == 0) or (msg[0][1] == 0):
                         currentError = currentError + seedWeight*abs(msg[1] - calcDistance(currentGuess, reportedPoint))
                         xGradError = xGradError + seedWeight*abs(msg[1] - calcDistance(xGradEval, reportedPoint))
                         yGradError = yGradError + seedWeight*abs(msg[1] - calcDistance(yGradEval, reportedPoint))
@@ -205,13 +219,38 @@ class Robot(object):
                         yGradError = yGradError + abs(msg[1] - calcDistance(yGradEval, reportedPoint))
 
                 # Calculate the gradient
-                xGrad = (currentError-xGradError)/(self.xGuess*gradScale)
-                yGrad = (currentError-yGradError)/(self.yGuess*gradScale)
+                xGrad = (xGradError-currentError)/(gradScale)
+                yGrad = (yGradError-currentError)/(gradScale)
 
-                # Assign new guess
-                self.xGuess = newtonRaphson(self.xGuess, currentError, xGrad)
-                self.yGuess = newtonRaphson(self.yGuess, currentError, yGrad)
+                """print '------'
+                print [self.xGuess,self.yGuess]
+                print [self.xTrue, self.yTrue]
+                print [self.hop1,self.hop2]
+                print '------'"""
+                #print [xGradError - currentError, yGradError - currentError]
+                
+                # Assign new guess if not a seed
+                if self.amSeed == 0:
+                    #self.xGuess = newtonRaphson(self.xGuess, currentError, xGrad)
+                    #self.yGuess = newtonRaphson(self.yGuess, currentError, yGrad)
 
+                    # Super Simple Method
+                    if xGradError < currentError:
+                        self.xGuess = self.xGuess+gradScale
+                    else:
+                        self.xGuess = self.xGuess-gradScale
+
+                    if yGradError < currentError:
+                        self.yGuess = self.yGuess+gradScale
+                    else:
+                        self.yGuess = self.yGuess - gradScale
+                        
+                else:
+                    self.xGuess = self.xTrue
+                    self.yGuess = self.yTrue
+
+            #time.sleep(2)            
+            
         return
         
 

@@ -11,6 +11,7 @@ Required Libraries: N/A
 ----------------------------------------------------------------------------------------------------
 Revision History:
 11/10/2017 (1): Initial creation
+11/15/2017 (1): Added special case for zero slope
 
 ----------------------------------------------------------------------------------------------------
 TODO:
@@ -33,9 +34,13 @@ TODO:
 ###################################################################################################
 # Main Function
 ###################################################################################################
-def newtonRaphson(x_n, f_n, fp_n):
+def newtonRaphson(x, f, fp):
     # Calculate and return the next point for NewtonRaphson
-    
-    x_np1 = x_n - f_n/fp_n
+
+    # Special case if f prime = 0
+    if fp == 0:
+        x_np1 = x + 0.001
+    else:
+        x_np1 = x - f/fp
     
     return x_np1

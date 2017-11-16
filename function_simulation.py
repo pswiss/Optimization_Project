@@ -27,7 +27,6 @@ Create function to draw robots
 ###################################################################################################
 import sys
 import random
-random.seed('Petras Swissler')
 
 import math
 import time
@@ -41,12 +40,14 @@ import time
 from function_drawRobots import *
 from function_calcFitness import *
 from function_calcError import *
+from function_initRobots import *
 
 ###################################################################################################
 # Main Function
 ###################################################################################################
 
 def simulation(config, comProperties):
+    import random
     print 'simStart'
     
     fitness = 0                 # Temporary value
@@ -56,27 +57,31 @@ def simulation(config, comProperties):
     numRobots       = config[0]         # Number of robots to simulate
     numCycles       = config[1]         # Number of communication cycles to simulate
     showGraphics    = config[2]         # 0 1 or 2: Defines whether to draw the robots (currently not implemented)
-    random.seed(config[3])              # Allows changes to randomness seed
-    reportFile      = config[4]
+    #random.seed(config[3])              # Allows changes to randomness seed
+    reportFile      = config[3]
 
-    comRange    =   comProperties[0]    # radius
-    comLossRate =   comProperties[1]    # % of time that communication is lost
-    comScale    =   comProperties[2]    # Constant scale of range measurements
-    comVar      =   comProperties[3]    # variance in individual range measurements
-    #comEccen    =   comProperties[4]    # Eccentricity of the communication range measurements (not implemented)
-    
+    # Com properties are passed as 0-1: Some require attenuation
+
+    comRange    =   comProperties[0]*comRangeScale  # radius (0-comRangeScale)
+    comLossRate =   comProperties[1]                # % of time that communication is lost
+    comScale    =   comProperties[2]        # Constant scale of range measurements (0-2)
+    comVar      =   comProperties[3]*comRange       # variance in individual range measurements
+        
     #----------------------------------------------------------------------------------------------
     # Initialize the simulation
     Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar)
 
+    print 'Robots Initialized'
+
+    ####ffile = open(reportFile,"a")
+
     # Run for n cycles
     for i in range(numCycles):
-        print "hi\n"
         # generate the com list (list of all communications being sent O(N)
-        comList = 0 #clear the com list
+        comList = [] #clear the com list
         for robot in Robots:
             comList.append(robot.sendCom())
-
+        
         for robot in Robots:
             # Robot takes in all communications, decides which ones it will recieve
             robot.recCom(comList)
@@ -85,13 +90,20 @@ def simulation(config, comProperties):
 
         # Compute position errors
         errors = calcError(Robots)
-
+        
+        #####ffile.write(average(errors))
+        
         # If configured to draw robots in intermediate states (2), draw them
         if showGraphics == 2:
             drawRobots(Robots)
 
+        print sum(errors)/len(errors)
+    #####ffile.close()
     # Calculate the fitness of the final robot states
     fitness = calcFitness(errors, comProperties)
+    
+    print fitness
+    
 
     # if configured to draw robots in the end (1 or 2), draw them
     if showGraphics != 0:

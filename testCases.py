@@ -25,7 +25,6 @@ Make easy to configure
 ###################################################################################################
 import sys
 import random
-random.seed('Petras Swissler')
 
 import math
 import time
@@ -42,4 +41,4 @@ from function_simulation import*
 # Main Function
 ###################################################################################################
 
-simulation([1,2,3,4,5],[1,2,3,4,5])
+simulation([75, 1000, 0, "Run1.txt"],[.4, .01, .1, .01])

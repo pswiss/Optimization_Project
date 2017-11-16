@@ -10,6 +10,7 @@ Required Libraries: N/A
 ----------------------------------------------------------------------------------------------------
 Revision History:
 11/12/2017 (1): Creation of file
+11/15/2017 (1): Fixed infinite Loop bug
 
 ----------------------------------------------------------------------------------------------------
 TODO:
@@ -53,18 +54,18 @@ def initRobots(numRobots, comRange, comLossRate, comScale, comVar):
         okToAdd = False
 
         # Search for a location to put the robot
-        while ~okToAdd:
-            # Assume it will be ok
-            okToAdd = True
-
+        while not okToAdd:
+            # Generate a random Point in the arena            
             xCheck = random() * arenaX
             yCheck = random() * arenaY
 
+            okToAdd = True
             # Check for interference with all robots
-            for robot in robotList:
-                if roboDiam > calcDistance([xCheck, yCheck],[robot.xTrue, robot.yTrue]):
-                    okToAdd = False
-                    break
+            for j, robot in enumerate(robotList):
+                dist = calcDistance([xCheck, yCheck],[robot.xTrue, robot.yTrue])
+                # Check that far enough away
+                if dist < (roboDiam/2):
+                    okToAdd = False                    
                 #
             #
         # Add the robot at the valid coordinate
