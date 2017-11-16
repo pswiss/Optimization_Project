@@ -10,6 +10,7 @@ Required Libraries: N/A
 ----------------------------------------------------------------------------------------------------
 Revision History:
 11/08/2017 (1): Initial creation of dummy file
+11/16/2017 (1): Added bulk of program
 
 ----------------------------------------------------------------------------------------------------
 TODO:
@@ -21,7 +22,9 @@ Implement
 ###################################################################################################
 # Setup
 ###################################################################################################
-
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
 
 ###################################################################################################
 # Classes
@@ -36,5 +39,18 @@ Implement
 ###################################################################################################
 
 def drawRobots(Robots):
+    # Set up the plot area
+    fig, ax = plt.subplots()
+    
+    for robot in Robots:
+        # Generate the vertices
+        trueVert = [robot.xTrue, robot.yTrue]
+        guessVert = [robot.xGuess, robot.yGuess]
+        verts = [trueVert, guessVert]
+
+        ax.plot(trueVert,guessVert, color = 'r')
+        ax.plot(trueVert, 'o')
+        
+    
     return 0
 #Not implemented

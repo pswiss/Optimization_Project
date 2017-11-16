@@ -30,6 +30,7 @@ import random
 
 import math
 import time
+
 ###################################################################################################
 # Classes
 ###################################################################################################
@@ -97,12 +98,13 @@ def simulation(config, comProperties):
         if showGraphics == 2:
             drawRobots(Robots)
 
-        print sum(errors)/len(errors)
+        #print sum(errors)/len(errors)
+            
     #####ffile.close()
     # Calculate the fitness of the final robot states
     fitness = calcFitness(errors, comProperties)
     
-    print fitness
+    #print fitness
     
 
     # if configured to draw robots in the end (1 or 2), draw them

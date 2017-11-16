@@ -9,10 +9,10 @@ cyclesForHop = 20
 numIterNR = 5
 
 # Scale of the gradient points
-gradScale = 0.1
+gradScale = 0.05
 
 # Bonus weight for seeds when calculating gradient
-seedWeight = 10
+seedWeight = 1
 
 # Seed properties
 numSeeds = 2

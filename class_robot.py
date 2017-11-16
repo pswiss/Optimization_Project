@@ -196,8 +196,8 @@ class Robot(object):
             
                 # Create current point and two gradient eval points
                 currentGuess = [self.xGuess, self.yGuess]
-                xGradEval = [self.xGuess+gradScale, self.yGuess]
-                yGradEval = [self.xGuess, self.yGuess+gradScale]
+                xGradEval = [self.xGuess*(1+gradScale), self.yGuess]
+                yGradEval = [self.xGuess, self.yGuess*(1+gradScale)]
                 
                 # Calculate the position error for each of the three points (guess + grads)
                 currentError = 0
@@ -205,6 +205,7 @@ class Robot(object):
                 yGradError = 0
                 
                 # Iterate through each recieved message and sum the Errors
+                
                 for msg in self.recievedComs:
                     reportedPoint = [msg[0][2],msg[0][3]]
                     # special case for if message is a seed: Weight higher
@@ -218,22 +219,44 @@ class Robot(object):
                         xGradError = xGradError + abs(msg[1] - calcDistance(xGradEval, reportedPoint))
                         yGradError = yGradError + abs(msg[1] - calcDistance(yGradEval, reportedPoint))
 
+                
                 # Calculate the gradient
                 xGrad = (xGradError-currentError)/(gradScale)
                 yGrad = (yGradError-currentError)/(gradScale)
-
-                """print '------'
-                print [self.xGuess,self.yGuess]
-                print [self.xTrue, self.yTrue]
-                print [self.hop1,self.hop2]
-                print '------'"""
-                #print [xGradError - currentError, yGradError - currentError]
                 
                 # Assign new guess if not a seed
                 if self.amSeed == 0:
                     #self.xGuess = newtonRaphson(self.xGuess, currentError, xGrad)
                     #self.yGuess = newtonRaphson(self.yGuess, currentError, yGrad)
+                    if xGradError < currentError:
+                        self.xGuess = self.xGuess*(1+gradScale)
+                    else:
+                        self.xGuess = self.xGuess*(1-gradScale)
 
+                    if yGradError < currentError:
+                        self.yGuess = self.yGuess*(1+gradScale)
+                    else:
+                        self.yGuess = self.yGuess*(1- gradScale)
+
+                    # Error Recovery:
+                    if self.xGuess < 1:
+                        self.xGuess = 1
+                    if self.yGuess < 1:
+                        self.yGuess = 1
+                    
+                else:
+                    self.xGuess = self.xTrue
+                    self.yGuess = self.yTrue
+                #
+
+                print [self.xGuess, self.yGuess, self.xTrue, self.yTrue]
+            #
+            
+        #
+        return
+    #
+#
+"""
                     # Super Simple Method
                     if xGradError < currentError:
                         self.xGuess = self.xGuess+gradScale
@@ -244,14 +267,11 @@ class Robot(object):
                         self.yGuess = self.yGuess+gradScale
                     else:
                         self.yGuess = self.yGuess - gradScale
-                        
-                else:
-                    self.xGuess = self.xTrue
-                    self.yGuess = self.yTrue
+                        """
+                
 
             #time.sleep(2)            
             
-        return
         
 
 
