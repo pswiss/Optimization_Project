@@ -54,7 +54,7 @@ def drawRobots(Robots):
         ax.plot(trueVert[0],trueVert[1], 'o')
 
     plt.xlim(0,200)
-    plt.ylim(0,200)
+    plt.ylim(-50,200)
     plt.show()
     time.sleep(0)
     plt.close()

@@ -129,8 +129,6 @@ class Robot(object):
             if recieveCom == True:
                 # Calculate the range measurements
                 rangeMeas = max(0,distance * self.comScale + normalvariate(0,pow(self.comVar,0.5)))
-
-                #print rangeMeas / (distance + 0.001)
                 
                 self.recievedComs.append([message,rangeMeas])
 
@@ -154,7 +152,16 @@ class Robot(object):
         # Check what the lowest hopcount of any message I see is for hop1 and hop2
         # Update to that number + 1
         # Check each message for updated hop seed locations
+
+        hop1average = 0;
+        hop2average = 0;
+        msgcnt = 0
+        
         for msg in self.recievedComs:
+            msgcnt = msgcnt + 1
+
+            hop1average = ((msgcnt -1)*hop1average + msg[0][0])/(msgcnt+.001)
+            hop2average = ((msgcnt -1)*hop2average + msg[0][1])/(msgcnt+.001)
             
             if (self.hop1 > (msg[0][0]+1)):
                 # Update my hop count information
@@ -168,6 +175,9 @@ class Robot(object):
                 self.hop2x = msg[0][8]
                 self.hop2y = msg[0][9]
 
+        #hop1average = hop1average / len(msg)
+        #hop2average = hop2average / len(msg)
+
         
         # Decrement hop localization timer
         self.hopLocalizeTimer = max(0,self.hopLocalizeTimer-1)
@@ -175,19 +185,21 @@ class Robot(object):
         # If hop count timer hasn't expired, localize based on hop-count
         if self.hopLocalizeTimer > 0:
             # Estimate how far I am from the the seeds
-            hop1dist = self.hop1 * (hopScale ) + 0.01
-            hop2dist = self.hop2 * (hopScale ) + 0.01
-
-            #print [hop1dist,hop2dist]
+            hop1dist = hop1average * (hopScale ) + 0.01
+            hop2dist = hop2average * (hopScale ) + 0.01
 
             # Assign new guess if not a seed
             if self.amSeed == 0:
                 # Assume up against wall, seed is only in x
                 # Derived using geometry
-                self.yGuess = pow( (pow(hop1dist,2)-pow(hop2dist,2))/((pow(hop1dist,2)/pow(hop2dist,2)+.01)-(pow(hop2dist,2)/pow(hop1dist,2)+.01)+.01),0.5)
-                self.xGuess = pow( pow(hop1dist,2)-pow(self.yGuess,2),0.5)
-                #self.xGuess = self.hop1x + self.hop2x * (hop1dist*hop1dist / (hop1dist + hop2dist*hop2dist))
-                #self.yGuess = self.xGuess*(hop2dist / hop1dist)
+                #self.yGuess = pow( (pow(hop1dist,2)-pow(hop2dist,2))/((pow(hop1dist,2)/pow(hop2dist,2)+.001)-(pow(hop2dist,2)/pow(hop1dist,2)+.01)+.001),0.5)
+                #self.xGuess = pow( pow(hop1dist,2)-pow(self.yGuess,2),0.5)
+                L = abs(self.hop2x - self.hop1x)
+                
+                self.xGuess = (L*L+hop1dist*hop1dist-hop2dist*hop2dist)/(2*L+0.00001)
+                self.yGuess = pow(((L + hop1dist + hop2dist)*(L + hop1dist - hop2dist)*(L-hop1dist + hop2dist)*(hop1dist - L + hop2dist)),1/2)/(2*L+0.001)
+                
+                
             else:
                 self.xGuess = self.xTrue
                 self.yGuess = self.yTrue
@@ -251,31 +263,8 @@ class Robot(object):
                     self.xGuess = self.xTrue
                     self.yGuess = self.yTrue
                 #
-
-                #print [self.xGuess, self.yGuess, self.xTrue, self.yTrue]
             #
-            
         #
         return
     #
 #
-"""
-                    # Super Simple Method
-                    if xGradError < currentError:
-                        self.xGuess = self.xGuess+gradScale
-                    else:
-                        self.xGuess = self.xGuess-gradScale
-
-                    if yGradError < currentError:
-                        self.yGuess = self.yGuess+gradScale
-                    else:
-                        self.yGuess = self.yGuess - gradScale
-                        """
-                
-
-            #time.sleep(2)            
-            
-        
-
-
-

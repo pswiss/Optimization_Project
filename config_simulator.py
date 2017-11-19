@@ -20,8 +20,8 @@ seedX = [0, 100]
 seedY = [0, 0]
 
 # Arena Properties
-arenaX = 150
-arenaY = 150
+arenaX = 100
+arenaY = 100
 
 # Robot Dimensions
 roboDiam = 10
