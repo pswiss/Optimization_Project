@@ -39,5 +39,5 @@ costVar = 1
 
 
 # For hopcount localization, estimate where the message is coming from
-hopScale = 4*roboDiam
+hopScale = 2*roboDiam
 

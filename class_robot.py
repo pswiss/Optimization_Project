@@ -13,11 +13,12 @@ Revision History:
 11/08/2017 (1): Initial creation
 11/10/2017 (1): Added recCom function
 11/12/2017 (1): First attempt complete
+11/15/2017 (1): Syntactical Bugs Fixed
 
 ----------------------------------------------------------------------------------------------------
 TODO:
 
-Validate
+Work on localizationmethod
 
 ----------------------------------------------------------------------------------------------------
 """
@@ -88,8 +89,6 @@ class Robot(object):
 
         # Timer variables
         self.hopLocalizeTimer = cyclesForHop
-
-        
 
     ###############################################################################################
     # Send communication function
@@ -169,22 +168,26 @@ class Robot(object):
                 self.hop2x = msg[0][8]
                 self.hop2y = msg[0][9]
 
+        
         # Decrement hop localization timer
         self.hopLocalizeTimer = max(0,self.hopLocalizeTimer-1)
-
 
         # If hop count timer hasn't expired, localize based on hop-count
         if self.hopLocalizeTimer > 0:
             # Estimate how far I am from the the seeds
-            hop1dist = self.hop1 * (hopScale )
-            hop2dist = self.hop2 * (hopScale )
+            hop1dist = self.hop1 * (hopScale ) + 0.01
+            hop2dist = self.hop2 * (hopScale ) + 0.01
+
+            #print [hop1dist,hop2dist]
 
             # Assign new guess if not a seed
             if self.amSeed == 0:
                 # Assume up against wall, seed is only in x
                 # Derived using geometry
-                self.xGuess = self.hop1x + self.hop2x * (hop1dist*hop1dist / (hop1dist + hop2dist*hop2dist))
-                self.yGuess = self.xGuess*(hop2dist / hop1dist)
+                self.yGuess = pow( (pow(hop1dist,2)-pow(hop2dist,2))/((pow(hop1dist,2)/pow(hop2dist,2)+.01)-(pow(hop2dist,2)/pow(hop1dist,2)+.01)+.01),0.5)
+                self.xGuess = pow( pow(hop1dist,2)-pow(self.yGuess,2),0.5)
+                #self.xGuess = self.hop1x + self.hop2x * (hop1dist*hop1dist / (hop1dist + hop2dist*hop2dist))
+                #self.yGuess = self.xGuess*(hop2dist / hop1dist)
             else:
                 self.xGuess = self.xTrue
                 self.yGuess = self.yTrue
