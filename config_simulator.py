@@ -9,10 +9,10 @@ cyclesForHop = 20
 numIterNR = 5
 
 # Scale of the gradient points
-gradScale = 0.05
+gradScale = 0.1
 
 # Bonus weight for seeds when calculating gradient
-seedWeight = 1
+seedWeight = 5
 
 # Seed properties
 numSeeds = 2
@@ -36,8 +36,3 @@ costRange = 1
 costLossRate = 1
 costScale = 1
 costVar = 1
-
-
-# For hopcount localization, estimate where the message is coming from
-hopScale = 2*roboDiam
-

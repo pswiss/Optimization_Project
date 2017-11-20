@@ -40,7 +40,8 @@ def newtonRaphson(x, f, fp):
     # Special case if f prime = 0
     if fp == 0:
         x_np1 = x + 0.001
+        
     else:
-        x_np1 = x - f/fp
-    
+        x_np1 = x*1.000 - f/(fp*1.000)
+
     return x_np1

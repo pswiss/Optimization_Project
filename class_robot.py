@@ -47,12 +47,14 @@ from function_newtonRaphson import *
 class Robot(object):
     ###############################################################################################
     # Constructor Function
-    def __init__(self,comRange, comLossRate, comScale, comVar, xpos, ypos, isSeed):
+    def __init__(self,comRange, comLossRate, comScale, comVar, xpos, ypos, isSeed, hopScale):
         self.comRange = comRange
         self.comLossRate = comLossRate
         self.comVar = comVar
         # Calculate the linear scale of the communication
         self.comScale = 1+comScale*(2*random()-1)
+
+        self.hopScale = hopScale*roboDiam
         
         self.xTrue = xpos
         self.yTrue = ypos
@@ -133,6 +135,7 @@ class Robot(object):
                 self.recievedComs.append([message,rangeMeas])
 
         # All recieved messages have been added. This function does not pass any values
+            
         return
 
     ###############################################################################################
@@ -185,8 +188,8 @@ class Robot(object):
         # If hop count timer hasn't expired, localize based on hop-count
         if self.hopLocalizeTimer > 0:
             # Estimate how far I am from the the seeds
-            hop1dist = hop1average * (hopScale ) + 0.01
-            hop2dist = hop2average * (hopScale ) + 0.01
+            hop1dist = hop1average * (self.hopScale ) + 0.01
+            hop2dist = hop2average * (self.hopScale ) + 0.01
 
             # Assign new guess if not a seed
             if self.amSeed == 0:
@@ -197,7 +200,8 @@ class Robot(object):
                 L = abs(self.hop2x - self.hop1x)
                 
                 self.xGuess = (L*L+hop1dist*hop1dist-hop2dist*hop2dist)/(2*L+0.00001)
-                self.yGuess = pow(((L + hop1dist + hop2dist)*(L + hop1dist - hop2dist)*(L-hop1dist + hop2dist)*(hop1dist - L + hop2dist)),1/2)/(2*L+0.001)
+                self.yGuess =   pow(abs(((L + hop1dist + hop2dist)*(L + hop1dist - hop2dist)*(L - hop1dist + hop2dist)*(hop1dist - L + hop2dist))),0.5)/(2*L+0.001)
+                                
                 
                 
             else:
@@ -211,8 +215,12 @@ class Robot(object):
             
                 # Create current point and two gradient eval points
                 currentGuess = [self.xGuess, self.yGuess]
-                xGradEval = [self.xGuess*(1+gradScale), self.yGuess]
-                yGradEval = [self.xGuess, self.yGuess*(1+gradScale)]
+
+                gradStepX = gradScale
+                gradStepY = gradScale
+                
+                xGradEval = [self.xGuess+gradStepX, self.yGuess]
+                yGradEval = [self.xGuess, self.yGuess+gradStepY]
                 
                 # Calculate the position error for each of the three points (guess + grads)
                 currentError = 0
@@ -225,39 +233,47 @@ class Robot(object):
                     reportedPoint = [msg[0][2],msg[0][3]]
                     # special case for if message is a seed: Weight higher
                     if (msg[0][0] == 0) or (msg[0][1] == 0):
-                        currentError = currentError + seedWeight*abs(msg[1] - calcDistance(currentGuess, reportedPoint))
-                        xGradError = xGradError + seedWeight*abs(msg[1] - calcDistance(xGradEval, reportedPoint))
-                        yGradError = yGradError + seedWeight*abs(msg[1] - calcDistance(yGradEval, reportedPoint))
+                        currentError = currentError + pow(seedWeight*abs(msg[1] - calcDistance(currentGuess, reportedPoint)),2)
+                        xGradError = xGradError + pow(seedWeight*abs(msg[1] - calcDistance(xGradEval, reportedPoint)),2)
+                        yGradError = yGradError + pow(seedWeight*abs(msg[1] - calcDistance(yGradEval, reportedPoint)),2)
 
                     else:
-                        currentError = currentError + abs(msg[1] - calcDistance(currentGuess, reportedPoint))
-                        xGradError = xGradError + abs(msg[1] - calcDistance(xGradEval, reportedPoint))
-                        yGradError = yGradError + abs(msg[1] - calcDistance(yGradEval, reportedPoint))
+                        currentError = currentError + pow(abs(msg[1] - calcDistance(currentGuess, reportedPoint)),2)
+                        xGradError = xGradError + pow(abs(msg[1] - calcDistance(xGradEval, reportedPoint)),2)
+                        yGradError = yGradError + pow(abs(msg[1] - calcDistance(yGradEval, reportedPoint)),2)
 
                 
                 # Calculate the gradient
-                xGrad = (xGradError-currentError)/(gradScale)
-                yGrad = (yGradError-currentError)/(gradScale)
+                xGrad = (xGradError-currentError)/(gradStepX+.001)
+                yGrad = (yGradError-currentError)/(gradStepY+.001)
+
+                #if self.hopLocalizeTimer == 0:
+                    #print [xGrad, yGrad, currentError, xGradError, yGradError, gradStepX, gradStepY]
                 
                 # Assign new guess if not a seed
                 if self.amSeed == 0:
-                    #self.xGuess = newtonRaphson(self.xGuess, currentError, xGrad)
-                    #self.yGuess = newtonRaphson(self.yGuess, currentError, yGrad)
+                    #self.xGuess = newtonRaphson(self.xGuess, currentError/1000.0, -xGrad)
+                    #self.yGuess = newtonRaphson(self.yGuess, currentError/1000.0, -yGrad)
                     if xGradError < currentError:
-                        self.xGuess = self.xGuess*(1+gradScale)
+                        self.xGuess = self.xGuess+gradStepX/2.0
                     else:
-                        self.xGuess = self.xGuess*(1-gradScale)
+                        self.xGuess = self.xGuess-gradStepX/2.0
 
                     if yGradError < currentError:
-                        self.yGuess = self.yGuess*(1+gradScale)
+                        self.yGuess = self.yGuess+gradStepY/2.0
                     else:
-                        self.yGuess = self.yGuess*(1- gradScale)
+                        self.yGuess = self.yGuess-gradStepY/2.0
 
                     # Error Recovery:
-                    if self.xGuess < 1:
+                    if self.xGuess < 0:
                         self.xGuess = 1
-                    if self.yGuess < 1:
+                    if self.yGuess < 0:
                         self.yGuess = 1
+
+                    """if self.xGuess > 100:
+                        self.xGuess = 99.5
+                    if self.yGuess > 100:
+                        self.yGuess = 99.5"""
                     
                 else:
                     self.xGuess = self.xTrue

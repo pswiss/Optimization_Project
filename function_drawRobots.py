@@ -40,7 +40,7 @@ import time
 # Main Function
 ###################################################################################################
 
-def drawRobots(Robots):
+def drawRobots(Robots, xaxis, yaxis, title, fileName):
     # Set up the plot area
     fig, ax = plt.subplots()
     
@@ -53,9 +53,18 @@ def drawRobots(Robots):
         ax.plot([trueVert[0],guessVert[0]], [trueVert[1],guessVert[1]], color = 'r')
         ax.plot(trueVert[0],trueVert[1], 'o')
 
-    plt.xlim(0,200)
-    plt.ylim(-50,200)
+    plt.xlim(0,100)
+    plt.ylim(0,100)
+
+    plt.title(title)
+    plt.xlabel(xaxis)
+    plt.ylabel(yaxis)
+
+    ax.set_aspect('equal')
+    fig.savefig(fileName,bbox_inches='tight')
+    
     plt.show()
+    
     time.sleep(0)
     plt.close()
         

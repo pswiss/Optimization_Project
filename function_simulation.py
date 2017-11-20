@@ -47,7 +47,26 @@ from function_initRobots import *
 # Main Function
 ###################################################################################################
 
-def simulation(config, comProperties):
+def simulation(config, comProperties, figProperties):
+    # Inputs:
+    #   config: general simulation configuration
+    #               0: Number of robots in the simulation
+    #               1: number of cycles to simulate
+    #               2: Draw behavior: 0 = never draw, 1 = draw @ end, 2 = draw after every cycle
+    #               3: Filename for the report file
+    #   comProperties: characteristics of robot communication, all quantities are scaled 0-1
+    #               0: radius (0-comRangeScale)
+    #               1: loss rate (% of time that communication is lost)
+    #               2: Constant scale of range measurements (0-2) (randomized)
+    #               3: variance in individual range measurements
+    #               4: Hop count scaling factor
+    #   figProperties: configuration for output figure
+    #               0: Filename for the output figure (must be .png)
+    #               1: Title of the figure
+    #               2: X axis Label
+    #               3: Y axis Label
+
+    
     import random
     print 'simStart'
     
@@ -67,10 +86,11 @@ def simulation(config, comProperties):
     comLossRate =   comProperties[1]                # % of time that communication is lost
     comScale    =   comProperties[2]        # Constant scale of range measurements (0-2)
     comVar      =   comProperties[3]*comRange       # variance in individual range measurements
+    hopScale    =   comProperties[4] # Assumed distance between robots
         
     #----------------------------------------------------------------------------------------------
     # Initialize the simulation
-    Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar)
+    Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale)
 
     print 'Robots Initialized'
 
@@ -96,7 +116,7 @@ def simulation(config, comProperties):
         
         # If configured to draw robots in intermediate states (2), draw them
         if showGraphics == 2:
-            drawRobots(Robots)
+            drawRobots(Robots, 'x', 'y', 'title','image.png')
 
         #print sum(errors)/len(errors)
             
@@ -109,7 +129,7 @@ def simulation(config, comProperties):
 
     # if configured to draw robots in the end (1 or 2), draw them
     if showGraphics != 0:
-        drawRobots(Robots)
+        drawRobots(Robots, 'x', 'y', 'title','image.png')
 
     return  fitness
     

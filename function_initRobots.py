@@ -39,14 +39,14 @@ from random import *
 # Main Function
 ###################################################################################################
 
-def initRobots(numRobots, comRange, comLossRate, comScale, comVar):
+def initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale):
     # This function will create an array of non-overlapping robots
 
     robotList = []
     
     # First create the seeds
     for i in range(numSeeds):
-        robotToAdd = Robot(comRange, comLossRate, comScale, comVar, seedX[i], seedY[i], i+1)
+        robotToAdd = Robot(comRange, comLossRate, comScale, comVar, seedX[i], seedY[i], i+1,hopScale)
         robotList.append(robotToAdd)
 
     #Then create the others
@@ -69,7 +69,7 @@ def initRobots(numRobots, comRange, comLossRate, comScale, comVar):
                 #
             #
         # Add the robot at the valid coordinate
-        robotToAdd = Robot(comRange, comLossRate, comScale, comVar, xCheck, yCheck, 0)
+        robotToAdd = Robot(comRange, comLossRate, comScale, comVar, xCheck, yCheck, 0, hopScale)
         robotList.append(robotToAdd)
         
     return robotList
