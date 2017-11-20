@@ -26,7 +26,9 @@ Create function to draw robots
 # Setup
 ###################################################################################################
 import sys
+
 import random
+from random import setstate
 
 import math
 import time
@@ -61,13 +63,14 @@ def simulation(config, comProperties, figProperties):
     #               3: variance in individual range measurements
     #               4: Hop count scaling factor
     #   figProperties: configuration for output figure
-    #               0: Filename for the output figure (must be .png)
+    #               0: Filename for the output figure (.png extension will be added)
     #               1: Title of the figure
     #               2: X axis Label
     #               3: Y axis Label
 
     
-    import random
+    #setState(config[5])
+    
     print 'simStart'
     
     fitness = 0                 # Temporary value
@@ -77,8 +80,8 @@ def simulation(config, comProperties, figProperties):
     numRobots       = config[0]         # Number of robots to simulate
     numCycles       = config[1]         # Number of communication cycles to simulate
     showGraphics    = config[2]         # 0 1 or 2: Defines whether to draw the robots (currently not implemented)
-    #random.seed(config[3])              # Allows changes to randomness seed
     reportFile      = config[3]
+    #random.seed(config[3])              # Allows changes to randomness seed
 
     # Com properties are passed as 0-1: Some require attenuation
 
@@ -94,7 +97,7 @@ def simulation(config, comProperties, figProperties):
 
     print 'Robots Initialized'
 
-    ####ffile = open(reportFile,"a")
+    ffile = open(reportFile,"a")
 
     # Run for n cycles
     for i in range(numCycles):
@@ -111,16 +114,26 @@ def simulation(config, comProperties, figProperties):
 
         # Compute position errors
         errors = calcError(Robots)
+        # Write the errors to the file
+        reportString = ''
+        for k, error in enumerate(errors):
+            if k==0:
+                reportString = str(error)
+            else:
+                reportString = reportString+', '+str(error)
+        reportString = reportString+';\n'
         
-        #####ffile.write(average(errors))
+        ffile.write(reportString)
         
         # If configured to draw robots in intermediate states (2), draw them
+        imageString = figProperties[0]+'_'+str(i)+'.png'
+        title = figProperties[1]+' Run '+str(i)
         if showGraphics == 2:
-            drawRobots(Robots, 'x', 'y', 'title','image.png')
+            drawRobots(Robots, figProperties[2], figProperties[3], title,imageString)
 
         #print sum(errors)/len(errors)
             
-    #####ffile.close()
+    ffile.close()
     # Calculate the fitness of the final robot states
     fitness = calcFitness(errors, comProperties)
     
@@ -128,8 +141,10 @@ def simulation(config, comProperties, figProperties):
     
 
     # if configured to draw robots in the end (1 or 2), draw them
+    imageString = figProperties[0]+'_final.png'
+    title = figProperties[1]+' Final'
     if showGraphics != 0:
-        drawRobots(Robots, 'x', 'y', 'title','image.png')
+        drawRobots(Robots, figProperties[2], figProperties[3], title,imageString)
 
     return  fitness
     

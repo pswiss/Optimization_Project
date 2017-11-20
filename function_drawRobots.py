@@ -63,11 +63,10 @@ def drawRobots(Robots, xaxis, yaxis, title, fileName):
     ax.set_aspect('equal')
     fig.savefig(fileName,bbox_inches='tight')
     
-    plt.show()
-    
-    time.sleep(0)
+    #plt.show()
+    #time.sleep(0)
+    #plt.close()
     plt.close()
         
-    
     return 0
 #Not implemented

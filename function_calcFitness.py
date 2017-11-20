@@ -46,13 +46,13 @@ def calcFitness(errors, comProperties):
     for err in errors:
         sumSqError = sumSqError + err
     
-    fitnessPositionError = len(errors) / sumSqError
+    fitnessPositionError = normDistFit*len(errors) / sumSqError
 
     # Calculate the portion of the fitness due to part cost
-    #                               Range                           Loss Rate                               Scaling                         Variance
-    componentCost = costRange*comProperties[0] + costLossRate*(1-comProperties[1]) + costScale*(2*abs(0.5-comProperties[2])) + costVar * comProperties[3]
+    #                               Range                           Loss Rate                     Scaling                         Variance
+    componentCost = costRange*comProperties[0] + costLossRate*(1-comProperties[1]) + costScale*(1-comProperties[2]) + costVar * (1-comProperties[3])
 
-    fitnessCost = 1/componentCost
+    fitnessCost = normCostFit/componentCost
     
     # Calculate the overall cost
 

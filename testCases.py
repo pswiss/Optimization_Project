@@ -41,4 +41,23 @@ from function_simulation import*
 # Main Function
 ###################################################################################################
 
-simulation([100, 100, 1, "Run1.txt"],[.2, .001, .001, .001, 1.5],'wip')
+config =        [100, 100, 0, "testRun.txt"]
+comProperties = [.2, .1, .1, .1, 1.5]
+figProperties = ['imageTest','Test Tile','x axis temp', 'y axis temp']
+
+
+sumOverallFit = 0
+sumDistFit = 0
+sumCostFit = 0
+k = 0
+for i in range(100):
+    fit = simulation(config, comProperties, figProperties)
+    k = k+1
+    sumOverallFit = sumOverallFit + fit[0]
+    sumDistFit = sumDistFit + fit[1]
+    sumCostFit = sumCostFit + fit[2]
+avgOverall = sumOverallFit / k
+avgDist = sumDistFit / k
+avgCost = sumCostFit / k
+
+print [avgOverall, avgDist, avgCost]
