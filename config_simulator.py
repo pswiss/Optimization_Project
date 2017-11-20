@@ -32,8 +32,8 @@ comRangeScale = 100
 # Fitness variables
 fitnessRatio = 0.5
 
-normDistFit = 1
-normCostFit = 1
+normDistFit = 6
+normCostFit = 7
 
 costRange = 1.15
 costLossRate = 4.31
