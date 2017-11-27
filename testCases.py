@@ -67,13 +67,13 @@ for i in range(populationNumber):
 	# All genes scaled 0-1. Assume no information regarding the genes
 	phenotypeVals = [random(), random(), random(), random()]
 
-	# Format the output text file
-	configSim = configSimDefault
-	configSim[3] = direct+'init'+str(i)+".txt"
-
 	# Calculate the average fitness for the phenotype
 	newFit = []
-	for i in range(numSimPerFit):
+	for k in range(numSimPerFit):
+		# Format the output text file
+		configSim = configSimDefault
+		configSim[3] = direct+'init'+str(i)+'-'+str(k)+".txt"
+
 		newFit.append(simulation(configSim, phenotypeVals,1.5,figProperties)[0])
 	fitness = sum(newFit) / len(newFit)
 
@@ -94,15 +94,15 @@ for i in range(generationsNumber):
 
 	# Loop through all of the population
 	for j, phenotypeVals in enumerate(population):
-		# Configure how the figure looks
-		figProps = [direct+"Gen"+str(i)+"Member"+str(j),"Gen"+str(i)+"Member"+str(j),"x","y"]
-		# Configure the output text file
-		configSim = configSimDefault
-		configSim[3] = direct+"Gen"+str(j)+"_Member"+str(i)+".txt"
-
 		# Calculate the average fitness for the phenotype
 		newFit = []
-		for i in range(numSimPerFit):
+		for k in range(numSimPerFit):
+			# Configure how the figure looks
+			figProps = [direct+"Gen"+str(i)+"Member"+str(j),"Gen"+str(i)+"Member"+str(j)+"-"+str(k),"x","y"]
+			# Configure the output text file
+			configSim = configSimDefault
+			configSim[3] = direct+"Gen"+str(j)+"_Member"+str(i)+"-"+str(k)+".txt"
+
 			newFit.append(simulation(configSim, phenotypeVals,1.5,figProperties)[0])
 		fitness = sum(newFit) / len(newFit)
 
