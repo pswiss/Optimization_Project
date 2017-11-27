@@ -33,6 +33,7 @@ import numpy as np
 from random import random
 
 from datetime import datetime
+import os
 ###################################################################################################
 # Classes
 ###################################################################################################
@@ -48,15 +49,18 @@ from arbiter import *
 ###################################################################################################
 # Main Function
 ###################################################################################################
-# Input prototypes
-figProperties = ['imageTest','Test Title','x axis temp', 'y axis temp']
-configSimDefault = [75, 100,0,"Run.txt"]
-phenotypeArray = []
-
+# Configure the write location
+direct = os.path.dirname(os.path.abspath(__file__))+'\\'+str(datetime.now()).replace(":",".")+'\\'
+os.makedirs(direct)
 # Start the file
-ffile = open(genReportFile,"a")
-ffile.write('Run Start: '+str(datetime.now()))
+ffile = open(direct+genReportFile,"a")
+ffile.write('Run Start: '+str(datetime.now())+'\n')
 ffile.close()
+
+# Input prototypes
+figProperties = [direct + 'imageTest','Test Title','x axis temp', 'y axis temp']
+configSimDefault = [75, 100,1,"Run"]
+phenotypeArray = []
 
 # First, create the first generation
 for i in range(populationNumber):
@@ -65,7 +69,7 @@ for i in range(populationNumber):
 
 	# Format the output text file
 	configSim = configSimDefault
-	configSim[3] = configSim[3]+str(i)+".txt"
+	configSim[3] = direct+'init'+str(i)+".txt"
 
 	# Calculate the average fitness for the phenotype
 	newFit = []
@@ -91,10 +95,10 @@ for i in range(generationsNumber):
 	# Loop through all of the population
 	for j, phenotypeVals in enumerate(population):
 		# Configure how the figure looks
-		figProps = ["Gen"+str(i)+"Member"+str(j),"Gen"+str(i)+"Member"+str(j),"x","y"]
+		figProps = [direct+"Gen"+str(i)+"Member"+str(j),"Gen"+str(i)+"Member"+str(j),"x","y"]
 		# Configure the output text file
 		configSim = configSimDefault
-		configSim[3] = "Gen"+str(j)+"_Member"+str(i)+".txt"
+		configSim[3] = direct+"Gen"+str(j)+"_Member"+str(i)+".txt"
 
 		# Calculate the average fitness for the phenotype
 		newFit = []
@@ -108,21 +112,21 @@ for i in range(generationsNumber):
 
 	# Pull out the best performing member of each population and record it
 	phenotypeSorted = sorted(phenotypeArray,key=lambda x: x[1])	#population sorted in ascending order
-	ffile = open(genReportFile,"a")
+	ffile = open(direct+genReportFile,"a")
 	ffile.write('Gen'+str(i)+'Complete at: '+str(datetime.now())+'\n')
 	ffile.write(str(phenotypeSorted[len(phenotypeSorted)]))
 	ffile.close()
 
 	# Simulate the best performer and export an image
 	# Configure how the figure looks
-	figProps = ["Gen"+str(i)+"Best","Gen"+str(i)+"Best","x","y"]
+	figProps = [direct+"Gen"+str(i)+"Best","Gen"+str(i)+"Best","x","y"]
 	# Configure the output text file
 	configSim = configSimDefault
-	configSim[3] = "Gen"+str(j)+"Best.txt"
+	configSim[3] = direct+"Gen"+str(j)+"Best.txt"
 	configSim[2] = 1
 	simulation(configSim, phenotypeSorted[len(phenotypeSorted)],1.5,figProperties)
 
 # End the file
-ffile = open(genReportFile,"a")
-ffile.write('Run Start: '+str(datetime.now()))
+ffile = open(direct+genReportFile,"a")
+ffile.write('Run Start: '+str(datetime.now())+'\n')
 ffile.close()
