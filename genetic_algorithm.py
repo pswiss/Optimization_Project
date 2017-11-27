@@ -22,7 +22,7 @@ def evolve(phenotypeArray,diversityRange,mutationScale,populationNumber,retain_v
 	    if mutate_value > random():
 	        mutation_position = randint(0, len(individual)-1)
 	        individual[mutation_position] = max(0,min(1,individual[mutation_position]*(1+mutationScale*(1-random()*2))))
-			
+
 	#crossover parents to create children
 	parents_len = len(parents)
 	desired_len = populationNumber - parents_len
@@ -36,10 +36,9 @@ def evolve(phenotypeArray,diversityRange,mutationScale,populationNumber,retain_v
 	        half = len(male) / 2
 	        #the child takes half of its dad's and half of its mom's genes (can play around with this value)
 	        child = male[:half] + female[half:]
-	        children.append(child)        
+	        children.append(child)
 	parents.extend(children)
 
 	print parents
 
 	return parents
-

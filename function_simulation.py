@@ -68,11 +68,11 @@ def simulation(config, comProperties, hopScale,figProperties):
     #               2: X axis Label
     #               3: Y axis Label
 
-    
+
     #setState(config[5])
-    
+
     #print 'simStart'
-    
+
     fitness = 0                 # Temporary value
     #----------------------------------------------------------------------------------------------
     # Setup
@@ -90,12 +90,10 @@ def simulation(config, comProperties, hopScale,figProperties):
     comScale    =   comProperties[2]        # Constant scale of range measurements (0-2)
     comVar      =   comProperties[3]*comRange       # variance in individual range measurements
     # hopScale    =   comProperties[4] # Assumed distance between robots
-        
+
     #----------------------------------------------------------------------------------------------
     # Initialize the simulation
     Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale)
-
-    #print 'Robots Initialized'
 
     ffile = open(reportFile,"a")
 
@@ -105,7 +103,7 @@ def simulation(config, comProperties, hopScale,figProperties):
         comList = [] #clear the com list
         for robot in Robots:
             comList.append(robot.sendCom())
-        
+
         for robot in Robots:
             # Robot takes in all communications, decides which ones it will recieve
             robot.recCom(comList)
@@ -122,23 +120,18 @@ def simulation(config, comProperties, hopScale,figProperties):
             else:
                 reportString = reportString+', '+str(error)
         reportString = reportString+';\n'
-        
+
         ffile.write(reportString)
-        
+
         # If configured to draw robots in intermediate states (2), draw them
         imageString = figProperties[0]+'_'+str(i)+'.png'
         title = figProperties[1]+' Run '+str(i)
         if showGraphics == 2:
             drawRobots(Robots, figProperties[2], figProperties[3], title,imageString)
 
-        #print sum(errors)/len(errors)
-            
     ffile.close()
     # Calculate the fitness of the final robot states
     fitness = calcFitness(errors, comProperties)
-    
-    #print fitness
-    
 
     # if configured to draw robots in the end (1 or 2), draw them
     imageString = figProperties[0]+'_final.png'
@@ -147,4 +140,3 @@ def simulation(config, comProperties, hopScale,figProperties):
         drawRobots(Robots, figProperties[2], figProperties[3], title,imageString)
 
     return  fitness
-    
