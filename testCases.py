@@ -50,7 +50,12 @@ sumOverallFit = 0
 sumDistFit = 0
 sumCostFit = 0
 k = 0
-for i in range(100):
+
+fit = simulation(config, comProperties, figProperties)
+
+print fit
+
+"""for i in range(2):
     fit = simulation(config, comProperties, figProperties)
     k = k+1
     sumOverallFit = sumOverallFit + fit[0]
@@ -60,4 +65,4 @@ avgOverall = sumOverallFit / k
 avgDist = sumDistFit / k
 avgCost = sumCostFit / k
 
-print [avgOverall, avgDist, avgCost]
+print [avgOverall, avgDist, avgCost]"""

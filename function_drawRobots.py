@@ -5,7 +5,7 @@ ME441: Optimization Project
 Author: Petras Swissler
 
 Python Version: 2.7
-Required Libraries: N/A
+Required Libraries: matplotlib, numpy
 
 ----------------------------------------------------------------------------------------------------
 Revision History:
