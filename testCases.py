@@ -109,6 +109,7 @@ for i in range(generationsNumber):
 	# Pull out the best performing member of each population and record it
 	phenotypeSorted = sorted(phenotypeArray,key=lambda x: x[1])	#population sorted in ascending order
 	ffile = open(genReportFile,"a")
+	ffile.write('Gen'+str(i)+'Complete at: '+str(datetime.now())+'\n')
 	ffile.write(str(phenotypeSorted[len(phenotypeSorted)]))
 	ffile.close()
 
@@ -120,3 +121,8 @@ for i in range(generationsNumber):
 	configSim[3] = "Gen"+str(j)+"Best.txt"
 	configSim[2] = 1
 	simulation(configSim, phenotypeSorted[len(phenotypeSorted)],1.5,figProperties)
+
+# End the file
+ffile = open(genReportFile,"a")
+ffile.write('Run Start: '+str(datetime.now()))
+ffile.close()
