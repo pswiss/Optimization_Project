@@ -28,6 +28,9 @@ import random
 
 import math
 import time
+
+import numpy as np
+from random import random
 ###################################################################################################
 # Classes
 ###################################################################################################
@@ -36,33 +39,54 @@ import time
 # Helper Functions
 ###################################################################################################
 from function_simulation import*
+from genetic_algorithm import *
+from function_initRobots import *
+from arbiter import *
 
 ###################################################################################################
 # Main Function
 ###################################################################################################
+figProperties = ['imageTest','Test Title','x axis temp', 'y axis temp']
+configSim = [75, 100,1,"Run"]
+phenotypeArray = []
 
-config =        [100, 100, 0, "testRun.txt"]
-comProperties = [.2, .1, .1, .1, 1.5]
-figProperties = ['imageTest','Test Tile','x axis temp', 'y axis temp']
+for i in range(populationNumber):
+	phenotypeVals = [random(), random(), random(), random()]
+	
+	configSimi = configSim
+	configSimi[3] = configSimi[3]+str(i)+".txt"
 
 
-sumOverallFit = 0
-sumDistFit = 0
-sumCostFit = 0
-k = 0
 
-fit = simulation(config, comProperties, figProperties)
+	fitness = simulation(configSimi, phenotypeVals,1.5,figProperties)
 
-print fit
+	appendPheno = [phenotypeVals, fitness[0]]
 
-"""for i in range(2):
-    fit = simulation(config, comProperties, figProperties)
-    k = k+1
-    sumOverallFit = sumOverallFit + fit[0]
-    sumDistFit = sumDistFit + fit[1]
-    sumCostFit = sumCostFit + fit[2]
-avgOverall = sumOverallFit / k
-avgDist = sumDistFit / k
-avgCost = sumCostFit / k
+	phenotypeArray.append(appendPheno)
 
-print [avgOverall, avgDist, avgCost]"""
+for i in range(generationsNumber):
+	print "Generation "+str(i)
+	population = evolve(phenotypeArray,diversityRange,mutationScale,populationNumber,retain_value, random_select, mutate_value)
+
+	phenotypeArray = []
+
+	for j in range(len(population)):
+
+		
+		figProps = ["Gen"+str(i)+"Member"+str(j),"Gen"+str(i)+"Member"+str(j),"x","y"]
+
+		phenotypeVals = population[j]
+				
+		configSimi = configSim
+		configSimi[3] = "Gen"+str(j)+"_Member"+str(i)+".txt"
+
+		fitness = simulation(configSimi, phenotypeVals,1.5,figProps)
+
+		appendPheno = [phenotypeVals, fitness[0]]
+
+		phenotypeArray.append(appendPheno)
+
+
+
+
+

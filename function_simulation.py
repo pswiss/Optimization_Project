@@ -49,7 +49,7 @@ from function_initRobots import *
 # Main Function
 ###################################################################################################
 
-def simulation(config, comProperties, figProperties):
+def simulation(config, comProperties, hopScale,figProperties):
     # Inputs:
     #   config: general simulation configuration
     #               0: Number of robots in the simulation
@@ -71,7 +71,7 @@ def simulation(config, comProperties, figProperties):
     
     #setState(config[5])
     
-    print 'simStart'
+    #print 'simStart'
     
     fitness = 0                 # Temporary value
     #----------------------------------------------------------------------------------------------
@@ -89,13 +89,13 @@ def simulation(config, comProperties, figProperties):
     comLossRate =   comProperties[1]                # % of time that communication is lost
     comScale    =   comProperties[2]        # Constant scale of range measurements (0-2)
     comVar      =   comProperties[3]*comRange       # variance in individual range measurements
-    hopScale    =   comProperties[4] # Assumed distance between robots
+    # hopScale    =   comProperties[4] # Assumed distance between robots
         
     #----------------------------------------------------------------------------------------------
     # Initialize the simulation
     Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale)
 
-    print 'Robots Initialized'
+    #print 'Robots Initialized'
 
     ffile = open(reportFile,"a")
 
