@@ -30,7 +30,7 @@ roboDiam = 10
 comRangeScale = 100
 
 # Fitness variables
-fitnessRatio = .85
+fitnessRatio = .5
 
 normDistFit = 35
 normCostFit = 7
