@@ -49,7 +49,7 @@ from function_initRobots import *
 # Main Function
 ###################################################################################################
 
-def simulation(config, comProperties, hopScale,figProperties):
+def simulation(config, comProperties, hopScale,figProperties,robotPlacement):
     # Inputs:
     #   config: general simulation configuration
     #               0: Number of robots in the simulation
@@ -93,7 +93,7 @@ def simulation(config, comProperties, hopScale,figProperties):
 
     #----------------------------------------------------------------------------------------------
     # Initialize the simulation
-    Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale)
+    Robots = initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale, robotPlacement)
 
     ffile = open(reportFile,"a")
 

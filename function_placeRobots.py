@@ -1,5 +1,5 @@
 """
-Initialize Robots
+Place Robots
 
 ME441: Optimization Project
 Author: Petras Swissler
@@ -9,15 +9,7 @@ Required Libraries: N/A
 
 ----------------------------------------------------------------------------------------------------
 Revision History:
-11/12/2017 (1): Creation of file
-11/15/2017 (1): Fixed infinite Loop bug
-
-----------------------------------------------------------------------------------------------------
-TODO:
-
-Implement
-
-----------------------------------------------------------------------------------------------------
+11/27/2017: Created
 """
 ###################################################################################################
 # Setup
@@ -38,24 +30,32 @@ from random import *
 ###################################################################################################
 # Main Function
 ###################################################################################################
-
-def initRobots(numRobots, comRange, comLossRate, comScale, comVar, hopScale, robotPlacement):
+def placeRobots(numRobots):
     # This function will create an array of non-overlapping robots
 
-    robotList = []
-
-    # First create the seeds
-    for i in range(numSeeds):
-        robotToAdd = Robot(comRange, comLossRate, comScale, comVar, seedX[i], seedY[i], i+1,hopScale)
-        robotList.append(robotToAdd)
+    placementList = []
 
     #Then create the others
-    for position in robotPlacement:
-        xAdd = position[0]
-        yAdd = position[1]
+    for i in range(numRobots - numSeeds):
+        okToAdd = False
 
+        # Search for a location to put the robot
+        while not okToAdd:
+            # Generate a random Point in the arena
+            xCheck = random() * arenaX
+            yCheck = random() * arenaY
+
+            okToAdd = True
+            # Check for interference with all robots
+            for j, robotPos in enumerate(placementList):
+                dist = calcDistance([xCheck, yCheck],[robotPos[0], robotPos[1]])
+                # Check that far enough away
+                if dist < (roboDiam/2):
+                    okToAdd = False
+                #
+            #
         # Add the robot at the valid coordinate
-        robotToAdd = Robot(comRange, comLossRate, comScale, comVar, xAdd, yAdd, 0, hopScale)
-        robotList.append(robotToAdd)
+        positionToAdd = [xCheck,yCheck]
+        placementList.append(positionToAdd)
 
-    return robotList
+    return placementList

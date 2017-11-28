@@ -45,6 +45,8 @@ from function_simulation import*
 from genetic_algorithm import *
 from function_initRobots import *
 from arbiter import *
+from function_placeRobots import *
+from config_simulator import *
 
 ###################################################################################################
 # Main Function
@@ -68,8 +70,12 @@ ffile.close()
 figProperties = [direct + 'imageTest','Test Title','x axis temp', 'y axis temp']
 phenotypeArray = []
 
+# Generate position for the first generationsNumber
+robotPositions = placeRobots(numRobots)
+
 # First, create the first generation
 for i in range(populationNumber):
+	figProperties = [direct + 'imageTest'+str(i),'Test Title','x axis temp', 'y axis temp']
 	# All genes scaled 0-1. Scale to guesses
 	phenotypeVals = [random(), random(), 0.5*random(), 0.5*random()]
 
@@ -80,7 +86,7 @@ for i in range(populationNumber):
 		configSim = configSimDefault
 		configSim[3] = direct+'init'+str(i)+'-'+str(k)+".txt"
 
-		newFit.append(simulation(configSim, phenotypeVals,hopScale,figProperties)[0])
+		newFit.append(simulation(configSim, phenotypeVals,hopScale,figProperties,robotPositions)[0])
 	fitness = sum(newFit) / len(newFit)
 
 	# Append the phenotype and fitness to the overall array
@@ -89,6 +95,9 @@ for i in range(populationNumber):
 
 # Loop through all generations
 for i in range(generationsNumber):
+	# Create robot positions for this generation
+	robotPositions = placeRobots(numRobots)
+
 	# Tracking print statement
 	print "Generation "+str(i)
 
@@ -110,7 +119,7 @@ for i in range(generationsNumber):
 			configSim[3] = direct+"Gen"+str(i)+"_Member"+str(j)+"-"+str(k)+".txt"
 			configSim[2] = 0
 
-			newFit.append(simulation(configSim, phenotypeVals,hopScale,figProps)[0])
+			newFit.append(simulation(configSim, phenotypeVals,hopScale,figProps,robotPositions)[0])
 		fitness = sum(newFit) / len(newFit)
 
 		# Add the new phenotype to the overall array
@@ -131,7 +140,7 @@ for i in range(generationsNumber):
 	configSim = configSimDefault
 	configSim[3] = direct+"Gen"+str(i)+"Best.txt"
 	configSim[2] = 1
-	simulation(configSim, phenotypeSorted[-1][0],hopScale,figProps)
+	simulation(configSim, phenotypeSorted[-1][0],hopScale,figProps,robotPositions)
 
 # End the file
 ffile = open(direct+genReportFile,"a")
