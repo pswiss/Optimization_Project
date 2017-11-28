@@ -9,7 +9,7 @@ cyclesForHop = 20
 numIterNR = 5
 
 # Scale of the gradient points
-gradScale = 0.1
+gradScale = 1
 
 # Bonus weight for seeds when calculating gradient
 seedWeight = 5
@@ -30,7 +30,7 @@ roboDiam = 10
 comRangeScale = 100
 
 # Fitness variables
-fitnessRatio = 0.5
+fitnessRatio = .85
 
 normDistFit = 35
 normCostFit = 7

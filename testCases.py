@@ -52,9 +52,9 @@ from config_simulator import *
 # Main Function
 ###################################################################################################
 # Default run parameters
-hopScale = 3.5
+hopScale = 3
 numRobots = 50
-simCycles = 100
+simCycles = 70
 configSimDefault = [numRobots, simCycles,0,"Run"]
 
 # Configure the write location
@@ -77,7 +77,7 @@ robotPositions = placeRobots(numRobots)
 for i in range(populationNumber):
 	figProperties = [direct + 'imageTest'+str(i),'Test Title','x axis temp', 'y axis temp']
 	# All genes scaled 0-1. Scale to guesses
-	phenotypeVals = [random(), random(), 0.5*random(), 0.5*random()]
+	phenotypeVals = [random(), 0.5*random(), 0.5*random(), 0.5*random()]
 
 	# Calculate the average fitness for the phenotype
 	newFit = []
@@ -141,6 +141,7 @@ for i in range(generationsNumber):
 	configSim[3] = direct+"Gen"+str(i)+"Best.txt"
 	configSim[2] = 1
 	simulation(configSim, phenotypeSorted[-1][0],hopScale,figProps,robotPositions)
+	print phenotypeSorted
 
 # End the file
 ffile = open(direct+genReportFile,"a")

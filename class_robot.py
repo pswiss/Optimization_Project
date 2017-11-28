@@ -264,10 +264,10 @@ class Robot(object):
                     if self.yGuess < 0:
                         self.yGuess = 1
 
-                    """if self.xGuess > 100:
-                        self.xGuess = 99.5
-                    if self.yGuess > 100:
-                        self.yGuess = 99.5"""
+                    """if self.xGuess > arenaX:
+                        self.xGuess = arenaX - 0.5
+                    if self.yGuess > arenaY:
+                        self.yGuess = arenaY - 0.5"""
 
                 else:
                     self.xGuess = self.xTrue

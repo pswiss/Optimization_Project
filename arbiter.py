@@ -6,9 +6,9 @@ target = 3.5;			#target number for the fitness function
 retain_value = 0.1		#percentage of how many of these we retain
 random_select = 0.05	#random diversity value
 mutate_value = 0.1		#random mutation value
-diversityRange = 2
-populationNumber = 80
-mutationScale = 0.5
+diversityRange = 1
+populationNumber = 50
+mutationScale = 0.2
 generationsNumber = 50
 
 numSimPerFit = 1
