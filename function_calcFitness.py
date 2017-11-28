@@ -44,8 +44,8 @@ def calcFitness(errors, comProperties):
     # Calculate the portion of the fitness due to position errors
     sumSqError = 0
     for err in errors:
-        sumSqError = sumSqError + err
-    
+        sumSqError = sumSqError + err*err
+
     fitnessPositionError = normDistFit*len(errors) / sumSqError
 
     # Calculate the portion of the fitness due to part cost
@@ -53,9 +53,9 @@ def calcFitness(errors, comProperties):
     componentCost = costRange*comProperties[0] + costLossRate*(1-comProperties[1]) + costScale*(1-comProperties[2]) + costVar * (1-comProperties[3])
 
     fitnessCost = normCostFit/componentCost
-    
+
     # Calculate the overall cost
 
     fitness = fitnessRatio * fitnessPositionError + (1-fitnessRatio)*fitnessCost
-    
+
     return [fitness, fitnessPositionError, fitnessCost]

@@ -14,14 +14,14 @@ gradScale = 0.1
 # Bonus weight for seeds when calculating gradient
 seedWeight = 5
 
+# Arena Properties
+arenaX = 75
+arenaY = 75
+
 # Seed properties
 numSeeds = 2
-seedX = [0, 100]
+seedX = [0, arenaX]
 seedY = [0, 0]
-
-# Arena Properties
-arenaX = 100
-arenaY = 100
 
 # Robot Dimensions
 roboDiam = 10
@@ -32,8 +32,8 @@ comRangeScale = 100
 # Fitness variables
 fitnessRatio = 0.5
 
-normDistFit = 1
-normCostFit = 1
+normDistFit = 35
+normCostFit = 7
 
 costRange = 1.15
 costLossRate = 4.31

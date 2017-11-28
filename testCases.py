@@ -49,23 +49,29 @@ from arbiter import *
 ###################################################################################################
 # Main Function
 ###################################################################################################
+# Default run parameters
+hopScale = 3.5
+numRobots = 50
+simCycles = 100
+configSimDefault = [numRobots, simCycles,0,"Run"]
+
 # Configure the write location
 direct = os.path.dirname(os.path.abspath(__file__))+'\\'+str(datetime.now()).replace(":",".")+'\\'
 os.makedirs(direct)
 # Start the file
 ffile = open(direct+genReportFile,"a")
 ffile.write('Run Start: '+str(datetime.now())+'\n')
+ffile.write(str(configSimDefault)+'\n')
 ffile.close()
 
-# Input prototypes
+# More input prototypes
 figProperties = [direct + 'imageTest','Test Title','x axis temp', 'y axis temp']
-configSimDefault = [75, 100,1,"Run"]
 phenotypeArray = []
 
 # First, create the first generation
 for i in range(populationNumber):
-	# All genes scaled 0-1. Assume no information regarding the genes
-	phenotypeVals = [random(), random(), random(), random()]
+	# All genes scaled 0-1. Scale to guesses
+	phenotypeVals = [random(), random(), 0.5*random(), 0.5*random()]
 
 	# Calculate the average fitness for the phenotype
 	newFit = []
@@ -74,7 +80,7 @@ for i in range(populationNumber):
 		configSim = configSimDefault
 		configSim[3] = direct+'init'+str(i)+'-'+str(k)+".txt"
 
-		newFit.append(simulation(configSim, phenotypeVals,1.5,figProperties)[0])
+		newFit.append(simulation(configSim, phenotypeVals,hopScale,figProperties)[0])
 	fitness = sum(newFit) / len(newFit)
 
 	# Append the phenotype and fitness to the overall array
@@ -102,8 +108,9 @@ for i in range(generationsNumber):
 			# Configure the output text file
 			configSim = configSimDefault
 			configSim[3] = direct+"Gen"+str(i)+"_Member"+str(j)+"-"+str(k)+".txt"
+			configSim[2] = 0
 
-			newFit.append(simulation(configSim, phenotypeVals,1.5,figProperties)[0])
+			newFit.append(simulation(configSim, phenotypeVals,hopScale,figProps)[0])
 		fitness = sum(newFit) / len(newFit)
 
 		# Add the new phenotype to the overall array
@@ -114,7 +121,7 @@ for i in range(generationsNumber):
 	phenotypeSorted = sorted(phenotypeArray,key=lambda x: x[1])	#population sorted in ascending order
 	ffile = open(direct+genReportFile,"a")
 	ffile.write('Gen'+str(i)+'Complete at: '+str(datetime.now())+'\n')
-	ffile.write(str(phenotypeSorted[len(phenotypeSorted)]))
+	ffile.write(str(phenotypeSorted[-1]))
 	ffile.close()
 
 	# Simulate the best performer and export an image
@@ -122,11 +129,11 @@ for i in range(generationsNumber):
 	figProps = [direct+"Gen"+str(i)+"Best","Gen"+str(i)+"Best","x","y"]
 	# Configure the output text file
 	configSim = configSimDefault
-	configSim[3] = direct+"Gen"+str(j)+"Best.txt"
+	configSim[3] = direct+"Gen"+str(i)+"Best.txt"
 	configSim[2] = 1
-	simulation(configSim, phenotypeSorted[len(phenotypeSorted)],1.5,figProperties)
+	simulation(configSim, phenotypeSorted[-1][0],hopScale,figProps)
 
 # End the file
 ffile = open(direct+genReportFile,"a")
-ffile.write('Run Start: '+str(datetime.now())+'\n')
+ffile.write('Run End: '+str(datetime.now())+'\n')
 ffile.close()

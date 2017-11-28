@@ -27,6 +27,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import time
+from config_simulator import *
 
 ###################################################################################################
 # Classes
@@ -43,7 +44,7 @@ import time
 def drawRobots(Robots, xaxis, yaxis, title, fileName):
     # Set up the plot area
     fig, ax = plt.subplots()
-    
+
     for robot in Robots:
         # Generate the vertices
         trueVert = [robot.xTrue, robot.yTrue]
@@ -53,8 +54,8 @@ def drawRobots(Robots, xaxis, yaxis, title, fileName):
         ax.plot([trueVert[0],guessVert[0]], [trueVert[1],guessVert[1]], color = 'r')
         ax.plot(trueVert[0],trueVert[1], 'o')
 
-    plt.xlim(0,100)
-    plt.ylim(0,100)
+    plt.xlim(0,arenaX)
+    plt.ylim(0,arenaY)
 
     plt.title(title)
     plt.xlabel(xaxis)
@@ -62,11 +63,11 @@ def drawRobots(Robots, xaxis, yaxis, title, fileName):
 
     ax.set_aspect('equal')
     fig.savefig(fileName,bbox_inches='tight')
-    
+
     #plt.show()
     #time.sleep(0)
     #plt.close()
     plt.close()
-        
+
     return 0
 #Not implemented

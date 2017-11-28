@@ -55,7 +55,7 @@ class Robot(object):
         self.comScale = 1+comScale*(2*random()-1)
 
         self.hopScale = hopScale*roboDiam
-        
+
         self.xTrue = xpos
         self.yTrue = ypos
 
@@ -106,14 +106,14 @@ class Robot(object):
     # Recieve communication function
     # This function recieves the global communication array and determines which ones it can see
     def recCom(self, globalComArray):
-        
+
         # Clear all recieved communications
         self.recievedComs = []
         self.rangeMeasurements = []
 
         # Check to see if recieve communication messages
         for message in globalComArray:
-            
+
             # Calculate the true distance between the two robots
             distance = calcDistance([self.xTrue, self.yTrue],[message[4], message[5]])
 
@@ -131,11 +131,11 @@ class Robot(object):
             if recieveCom == True:
                 # Calculate the range measurements
                 rangeMeas = max(0,distance * self.comScale + normalvariate(0,pow(self.comVar,0.5)))
-                
+
                 self.recievedComs.append([message,rangeMeas])
 
         # All recieved messages have been added. This function does not pass any values
-            
+
         return
 
     ###############################################################################################
@@ -147,7 +147,7 @@ class Robot(object):
 
         # return the error
         return distanceError
-        
+
     ###############################################################################################
     # Localization function
     # This function has two modes: 1) Hop count localization 2) Triangulation Localization. Both use Newton Raphson
@@ -159,13 +159,13 @@ class Robot(object):
         hop1average = 0;
         hop2average = 0;
         msgcnt = 0
-        
+
         for msg in self.recievedComs:
             msgcnt = msgcnt + 1
 
             hop1average = ((msgcnt -1)*hop1average + msg[0][0])/(msgcnt+.001)
             hop2average = ((msgcnt -1)*hop2average + msg[0][1])/(msgcnt+.001)
-            
+
             if (self.hop1 > (msg[0][0]+1)):
                 # Update my hop count information
                 self.hop1 = msg[0][0] + 1
@@ -178,10 +178,6 @@ class Robot(object):
                 self.hop2x = msg[0][8]
                 self.hop2y = msg[0][9]
 
-        #hop1average = hop1average / len(msg)
-        #hop2average = hop2average / len(msg)
-
-        
         # Decrement hop localization timer
         self.hopLocalizeTimer = max(0,self.hopLocalizeTimer-1)
 
@@ -198,37 +194,35 @@ class Robot(object):
                 #self.yGuess = pow( (pow(hop1dist,2)-pow(hop2dist,2))/((pow(hop1dist,2)/pow(hop2dist,2)+.001)-(pow(hop2dist,2)/pow(hop1dist,2)+.01)+.001),0.5)
                 #self.xGuess = pow( pow(hop1dist,2)-pow(self.yGuess,2),0.5)
                 L = abs(self.hop2x - self.hop1x)
-                
+
                 self.xGuess = (L*L+hop1dist*hop1dist-hop2dist*hop2dist)/(2*L+0.00001)
                 self.yGuess =   pow(abs(((L + hop1dist + hop2dist)*(L + hop1dist - hop2dist)*(L - hop1dist + hop2dist)*(hop1dist - L + hop2dist))),0.5)/(2*L+0.001)
-                                
-                
-                
+
             else:
                 self.xGuess = self.xTrue
                 self.yGuess = self.yTrue
-            
+
         else:
             # If hop done, use triangulation
             # Run n iterations of Newton Raphson to get new guess positions
             for i in range(numIterNR):
-            
+
                 # Create current point and two gradient eval points
                 currentGuess = [self.xGuess, self.yGuess]
 
                 gradStepX = gradScale
                 gradStepY = gradScale
-                
+
                 xGradEval = [self.xGuess+gradStepX, self.yGuess]
                 yGradEval = [self.xGuess, self.yGuess+gradStepY]
-                
+
                 # Calculate the position error for each of the three points (guess + grads)
                 currentError = 0
                 xGradError = 0
                 yGradError = 0
-                
+
                 # Iterate through each recieved message and sum the Errors
-                
+
                 for msg in self.recievedComs:
                     reportedPoint = [msg[0][2],msg[0][3]]
                     # special case for if message is a seed: Weight higher
@@ -242,14 +236,14 @@ class Robot(object):
                         xGradError = xGradError + pow(abs(msg[1] - calcDistance(xGradEval, reportedPoint)),2)
                         yGradError = yGradError + pow(abs(msg[1] - calcDistance(yGradEval, reportedPoint)),2)
 
-                
+
                 # Calculate the gradient
                 xGrad = (xGradError-currentError)/(gradStepX+.001)
                 yGrad = (yGradError-currentError)/(gradStepY+.001)
 
                 #if self.hopLocalizeTimer == 0:
                     #print [xGrad, yGrad, currentError, xGradError, yGradError, gradStepX, gradStepY]
-                
+
                 # Assign new guess if not a seed
                 if self.amSeed == 0:
                     #self.xGuess = newtonRaphson(self.xGuess, currentError/1000.0, -xGrad)
@@ -274,7 +268,7 @@ class Robot(object):
                         self.xGuess = 99.5
                     if self.yGuess > 100:
                         self.yGuess = 99.5"""
-                    
+
                 else:
                     self.xGuess = self.xTrue
                     self.yGuess = self.yTrue
