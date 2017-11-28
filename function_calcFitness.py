@@ -44,7 +44,7 @@ def calcFitness(errors, comProperties):
     # Calculate the portion of the fitness due to position errors
     sumSqError = 0
     for err in errors:
-        sumSqError = sumSqError + err
+        sumSqError = sumSqError + err*err
     
     fitnessPositionError = normDistFit*len(errors) / sumSqError
 

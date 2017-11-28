@@ -59,7 +59,7 @@ ffile.close()
 
 # Input prototypes
 figProperties = [direct + 'imageTest','Test Title','x axis temp', 'y axis temp']
-configSimDefault = [75, 100,1,"Run"]
+configSimDefault = [75, 100,0,"Run"]
 phenotypeArray = []
 
 # First, create the first generation
@@ -101,9 +101,10 @@ for i in range(generationsNumber):
 			figProps = [direct+"Gen"+str(i)+"Member"+str(j),"Gen"+str(i)+"Member"+str(j)+"-"+str(k),"x","y"]
 			# Configure the output text file
 			configSim = configSimDefault
+			configSim[2] = 0
 			configSim[3] = direct+"Gen"+str(i)+"_Member"+str(j)+"-"+str(k)+".txt"
 
-			newFit.append(simulation(configSim, phenotypeVals,1.5,figProperties)[0])
+			newFit.append(simulation(configSim, phenotypeVals,1.5,figProps)[0])
 		fitness = sum(newFit) / len(newFit)
 
 		# Add the new phenotype to the overall array
@@ -114,7 +115,7 @@ for i in range(generationsNumber):
 	phenotypeSorted = sorted(phenotypeArray,key=lambda x: x[1])	#population sorted in ascending order
 	ffile = open(direct+genReportFile,"a")
 	ffile.write('Gen'+str(i)+'Complete at: '+str(datetime.now())+'\n')
-	ffile.write(str(phenotypeSorted[len(phenotypeSorted)]))
+	ffile.write(str(phenotypeSorted[-1]))
 	ffile.close()
 
 	# Simulate the best performer and export an image
@@ -122,9 +123,9 @@ for i in range(generationsNumber):
 	figProps = [direct+"Gen"+str(i)+"Best","Gen"+str(i)+"Best","x","y"]
 	# Configure the output text file
 	configSim = configSimDefault
-	configSim[3] = direct+"Gen"+str(j)+"Best.txt"
+	configSim[3] = direct+"Gen"+str(i)+"Best.txt"
 	configSim[2] = 1
-	simulation(configSim, phenotypeSorted[len(phenotypeSorted)],1.5,figProperties)
+	simulation(configSim, phenotypeSorted[-1][0],1.5,figProps)
 
 # End the file
 ffile = open(direct+genReportFile,"a")
