@@ -7,7 +7,7 @@ retain_value = 0.1		#percentage of how many of these we retain
 random_select = 0.05	#random diversity value
 mutate_value = 0.3		#random mutation value
 diversityRange = 1
-populationNumber = 200
+populationNumber = 50
 mutationScale = 0.2
 generationsNumber = 100
 
